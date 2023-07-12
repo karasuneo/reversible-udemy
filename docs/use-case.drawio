@@ -1,11 +1,11 @@
 <mxfile host="65bd71144e">
     <diagram id="MDYp480DiMV7Z7zkJ4M1" name="ページ1">
-        <mxGraphModel dx="1330" dy="583" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1172" dy="672" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="2" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;リバーシ&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;アプリケーション&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;align=center;" vertex="1" parent="1">
-                    <mxGeometry y="60" width="300" height="300" as="geometry"/>
+                    <mxGeometry y="60" width="420" height="420" as="geometry"/>
                 </mxCell>
                 <mxCell id="3" value="プレイヤー" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
                     <mxGeometry x="-130" y="200" width="30" height="60" as="geometry"/>
@@ -62,6 +62,14 @@
                         <mxPoint x="-40" y="280" as="targetPoint"/>
                         <mxPoint x="95.64821976351573" y="196.93959984734613" as="sourcePoint"/>
                     </mxGeometry>
+                </mxCell>
+                <mxCell id="21" style="edgeStyle=none;html=1;" edge="1" parent="1" source="20">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-90" y="230.0000000000001" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" value="過去の対戦履歴を&lt;br&gt;確認" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="370" width="120" height="80" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
