@@ -6,6 +6,30 @@ info:
 
 paths:
   /api/games:
+    get:
+      responses:
+        200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    games:
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          winnerDisc:
+                            type: integer
+                            example: 1
+                          startedAt:
+                            type: string
+                            format: date-time
+                            example: "2021-01-01T00:00:00+09:00"
     post:
       responses:
         201:
@@ -43,9 +67,35 @@ paths:
                         [0, 0, 0, 0, 0, 0, 0, 0],
                         [0, 0, 0, 0, 0, 0, 0, 0],
                       ]
-                  nextDisc: 
+                  nextDisc:
                     type: integer
                     example: 1
                   winnerDisc:
                     type: integer
                     example: 1
+  /api/games/latest/turns:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                turnCount:
+                  type: integer
+                  example: 1
+                move:
+                  type: object
+                  properties:
+                    disc:
+                      type: integer
+                      example: 1
+                    x:
+                      type: integer
+                      example: 1
+                    y:
+                      type: integer
+                      example: 1
+      responses:
+        201:
+          description: Created
