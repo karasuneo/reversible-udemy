@@ -3,6 +3,7 @@ import morgan from "morgan";
 import "express-async-errors";
 import mysql from "mysql2/promise";
 import { GameGateway } from "./dataaccess/gameGateway";
+import { TurnGateway } from "./dataaccess/turnGateway";
 
 const EMPTY = 0;
 const DARK = 1;
@@ -28,6 +29,7 @@ app.use(express.static("static", { extensions: ["html"] }));
 app.use(express.json());
 
 const gameGateway = new GameGateway();
+const turnGateway = new TurnGateway();
 
 app.get("/api/hello", async (req, res) => {
   res.json({ message: "Hello Express" });
@@ -47,12 +49,13 @@ app.post("/api/games", async (req, res) => {
 
     const gameRecord = await gameGateway.insert(conn, now);
 
-    // turnsテーブルにゲームIDとターン数、次の石の色、終了時間を送ってデータを追加
-    const turnInsertResult = await conn.execute<any>(
-      "insert into turns (game_id, turn_count, next_disc, end_at) values (?, ?, ?, ?)",
-      [gameRecord.id, 0, DARK, now]
+    const turnRecord = await turnGateway.insert(
+      conn,
+      gameRecord.id,
+      0,
+      DARK,
+      now
     );
-    const turnId = turnInsertResult[0].insertId;
 
     // 二重配列の総数を取得
     const squareCount = INITIAL_BOARD.map((line) => line.length).reduce(
@@ -72,7 +75,7 @@ app.post("/api/games", async (req, res) => {
     // squaresInsertValuesにturnId, x, y, discを追加
     INITIAL_BOARD.forEach((line, y) => {
       line.forEach((disc, x) => {
-        squaresInsertValues.push(turnId);
+        squaresInsertValues.push(turnRecord.id);
         squaresInsertValues.push(x);
         squaresInsertValues.push(y);
         squaresInsertValues.push(disc);
@@ -101,17 +104,18 @@ app.get("/api/games/latest/turns/:turnCount", async (req, res) => {
       throw new Error("Latest Game not found");
     }
 
-    const turnSelectResult = await conn.execute<any>(
-      "select id, game_id, turn_count, next_disc, end_at from turns where game_id = ? and turn_count = ?",
-      [gameRecord.id, turnCount]
+    const turnRecord = await turnGateway.findForGameIdAndTurnCount(
+      conn,
+      gameRecord.id,
+      turnCount
     );
-
-    // 盤面の情報が二重配列で返ってくる
-    const turn = turnSelectResult[0][0];
+    if (!turnRecord) {
+      throw new Error("Specified turn not found");
+    }
 
     const squaresSelectResult = await conn.execute<any[]>(
       "select id, turn_id, x, y, disc from squares where turn_id = ?",
-      [turn["id"]]
+      [turnRecord.id]
     );
     const squares = squaresSelectResult[0];
     const board = Array.from(Array(8)).map(() => Array.from(Array(8)));
@@ -122,7 +126,7 @@ app.get("/api/games/latest/turns/:turnCount", async (req, res) => {
     const responseBody = {
       turnCount,
       board,
-      nextDisc: turn["next_disc"],
+      nextDisc: turnRecord.nextDisc,
       // TODO 決着がついている場合、game_resultsテーブルから取得する
       winnerDisc: null,
     };
@@ -148,17 +152,18 @@ app.post("/api/games/latest/turns", async (req, res) => {
 
     // 1つ前のターンの情報を取得
     const previousTurnCount = turnCount - 1;
-    const turnSelectResult = await conn.execute<any>(
-      "select id, game_id, turn_count, next_disc, end_at from turns where game_id = ? and turn_count = ?",
-      [gameRecord.id, previousTurnCount]
+    const turnRecord = await turnGateway.findForGameIdAndTurnCount(
+      conn,
+      gameRecord.id,
+      previousTurnCount
     );
-
-    // 盤面の情報が二重配列で返ってくる
-    const turn = turnSelectResult[0][0];
+    if (!turnRecord) {
+      throw new Error("Specified turn not found");
+    }
 
     const squaresSelectResult = await conn.execute<any[]>(
       "select id, turn_id, x, y, disc from squares where turn_id = ?",
-      [turn["id"]]
+      [turnRecord.id]
     );
     const squares = squaresSelectResult[0];
     const board = Array.from(Array(8)).map(() => Array.from(Array(8)));
@@ -206,8 +211,6 @@ app.post("/api/games/latest/turns", async (req, res) => {
         squaresInsertValues.push(disc);
       });
     });
-
-    console.log(squaresInsertValues);
 
     await conn.execute(squaresInsertSql, squaresInsertValues);
 
