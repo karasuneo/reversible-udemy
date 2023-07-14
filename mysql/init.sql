@@ -2,7 +2,7 @@ drop database if exists reversi;
 
 create database reversi;
 
-use rebersi;
+use reversi;
 
 create table games (
     id int primary key auto_increment,
@@ -11,11 +11,12 @@ create table games (
 
 create table turns (
     id int primary key auto_increment,
-    game_id int not null turn_content int not null,
+    game_id int not null,
+    turn_count int not null,
     next_disc int,
     end_at datetime not null,
     foreign key (game_id) references games (id),
-    unique (game_id, turn_content)
+    unique (game_id, turn_count)
 );
 
 create table moves (
@@ -37,10 +38,13 @@ create table squares (
     unique (turn_id, x, y)
 );
 
-create game_results (
+create table game_results (
     id int primary key auto_increment,
     game_id int not null,
     winner_disc int not null,
     end_at datetime not null,
     foreign key (game_id) references games (id)
 );
+
+select
+    'ok' as result;
