@@ -3,6 +3,21 @@ import morgan from "morgan";
 import "express-async-errors";
 import mysql from "mysql2/promise";
 
+const EMPTY = 0;
+const DARK = 1;
+const LIGHT = 2;
+
+const INITIAL_BOARD = [
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, DARK, LIGHT, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, LIGHT, DARK, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+];
+
 const PORT = 3000;
 
 const app = express();
@@ -19,7 +34,8 @@ app.get("/api/error", async (req, res) => {
 });
 
 app.post("/api/games", async (req, res) => {
-  const startedAt = new Date();
+  const now = new Date();
+
   const conn = await mysql.createConnection({
     host: "localhost",
     database: "reversi",
@@ -27,17 +43,49 @@ app.post("/api/games", async (req, res) => {
     password: "password",
   });
 
-  // try {
-  //   await conn.beginTransaction();
+  try {
+    await conn.beginTransaction();
 
-  //   await conn.execute("insert into games (started_at) values (?)", [
-  //     startedAt,
-  //   ]);
+    const gameInsertResult = await conn.execute<any>(
+      "insert into games (started_at) values (?)",
+      [now]
+    );
 
-  //   await conn.commit();
-  // } finally {
-  //   await conn.end();
-  // }
+    const gameId = gameInsertResult[0].insertId;
+
+    const turnInsertResult = await conn.execute<any>(
+      "insert into turns (game_id, turn_count, next_disc, end_at) values (?, ?, ?, ?)",
+      [gameId, 0, DARK, now]
+    );
+    const turnId = turnInsertResult[0].insertId;
+
+    const squareCount = INITIAL_BOARD.map((line) => line.length).reduce(
+      (v1, v2) => v1 + v2,
+      0
+    );
+
+    const squaresInsertResult =
+      "insert into squares (turn_id, x, y, disc) values " +
+      Array.from(Array(squareCount))
+        .map(() => "(?, ?, ?, ?)")
+        .join(", ");
+
+    const squaresInsertValues: any[] = [];
+    INITIAL_BOARD.forEach((line, y) => {
+      line.forEach((disc, x) => {
+        squaresInsertValues.push(turnId);
+        squaresInsertValues.push(x);
+        squaresInsertValues.push(y);
+        squaresInsertValues.push(disc);
+      });
+    });
+
+    await conn.execute(squaresInsertResult, squaresInsertValues);
+
+    await conn.commit();
+  } finally {
+    await conn.end();
+  }
 
   res.status(201).end();
 });
