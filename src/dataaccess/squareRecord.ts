@@ -7,7 +7,15 @@ export class SquareRecord {
     private _disc: number
   ) {}
 
-  get id() {
-    return this._id;
+  get x() {
+    return this._x;
+  }
+
+  get y() {
+    return this._y;
+  }
+
+  get disc() {
+    return this._disc;
   }
 }
