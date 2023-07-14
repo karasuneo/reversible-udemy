@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import "express-async-errors";
 import mysql from "mysql2/promise";
+import { GameGateway } from "./dataaccess/gameGateway";
 
 const EMPTY = 0;
 const DARK = 1;
@@ -26,6 +27,8 @@ app.use(morgan("dev"));
 app.use(express.static("static", { extensions: ["html"] }));
 app.use(express.json());
 
+const gameGateway = new GameGateway();
+
 app.get("/api/hello", async (req, res) => {
   res.json({ message: "Hello Express" });
 });
@@ -42,20 +45,12 @@ app.post("/api/games", async (req, res) => {
     // DBとの通信開始
     await conn.beginTransaction();
 
-    // gamesテーブルに今の時間を送ってデータを追加
-    const gameInsertResult = await conn.execute<any>(
-      "insert into games (started_at) values (?)",
-      [now]
-    );
-
-    // ゲームIDを取得
-    // 返り値としてResultSetHeader型が返ってくるため以下のように書く
-    const gameId = gameInsertResult[0].insertId;
+    const gameRecord = await gameGateway.insert(conn, now);
 
     // turnsテーブルにゲームIDとターン数、次の石の色、終了時間を送ってデータを追加
     const turnInsertResult = await conn.execute<any>(
       "insert into turns (game_id, turn_count, next_disc, end_at) values (?, ?, ?, ?)",
-      [gameId, 0, DARK, now]
+      [gameRecord.id, 0, DARK, now]
     );
     const turnId = turnInsertResult[0].insertId;
 
@@ -101,16 +96,14 @@ app.get("/api/games/latest/turns/:turnCount", async (req, res) => {
 
   const conn = await connectMySQL();
   try {
-    const gameSelectResult = await conn.execute<any>(
-      "select id, started_at from games order by id desc limit 1"
-    );
-
-    // 盤面の情報が二重配列で返ってくる
-    const game = gameSelectResult[0][0];
+    const gameRecord = await gameGateway.findLatest(conn);
+    if (!gameRecord) {
+      throw new Error("Latest Game not found");
+    }
 
     const turnSelectResult = await conn.execute<any>(
       "select id, game_id, turn_count, next_disc, end_at from turns where game_id = ? and turn_count = ?",
-      [game.id, turnCount]
+      [gameRecord.id, turnCount]
     );
 
     // 盤面の情報が二重配列で返ってくる
@@ -148,18 +141,16 @@ app.post("/api/games/latest/turns", async (req, res) => {
   // 1つ前のターンの情報を取得
   const conn = await connectMySQL();
   try {
-    const gameSelectResult = await conn.execute<any>(
-      "select id, started_at from games order by id desc limit 1"
-    );
-
-    // 盤面の情報が二重配列で返ってくる
-    const game = gameSelectResult[0][0];
+    const gameRecord = await gameGateway.findLatest(conn);
+    if (!gameRecord) {
+      throw new Error("Latest Game not found");
+    }
 
     // 1つ前のターンの情報を取得
     const previousTurnCount = turnCount - 1;
     const turnSelectResult = await conn.execute<any>(
       "select id, game_id, turn_count, next_disc, end_at from turns where game_id = ? and turn_count = ?",
-      [game.id, previousTurnCount]
+      [gameRecord.id, previousTurnCount]
     );
 
     // 盤面の情報が二重配列で返ってくる
@@ -188,7 +179,7 @@ app.post("/api/games/latest/turns", async (req, res) => {
     // turnsテーブルにゲームIDとターン数、次の石の色、終了時間を送ってデータを追加
     const turnInsertResult = await conn.execute<any>(
       "insert into turns (game_id, turn_count, next_disc, end_at) values (?, ?, ?, ?)",
-      [game["id"], turnCount, nextDisc, now]
+      [gameRecord.id, turnCount, nextDisc, now]
     );
     const turnId = turnInsertResult[0].insertId;
 
