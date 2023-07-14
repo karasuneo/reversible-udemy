@@ -71,7 +71,6 @@ app.post("/api/games", async (req, res) => {
         .map(() => "(?, ?, ?, ?)")
         .join(", ");
 
-    
     const squaresInsertValues: any[] = [];
 
     // squaresInsertValuesにturnId, x, y, discを追加
@@ -83,6 +82,8 @@ app.post("/api/games", async (req, res) => {
         squaresInsertValues.push(disc);
       });
     });
+
+    console.log(squaresInsertValues);
 
     await conn.execute(squaresInsertSql, squaresInsertValues);
 
@@ -115,7 +116,7 @@ app.get("/api/games/latest/turns/:turnCount", async (req, res) => {
     const turn = turnSelectResult[0][0];
 
     const squaresSelectResult = await conn.execute<any[]>(
-      "select id, turn_id x, y, disc from squares where turn_id = ?",
+      "select id, turn_id, x, y, disc from squares where turn_id = ?",
       [turn["id"]]
     );
     const squares = squaresSelectResult[0];
