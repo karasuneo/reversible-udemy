@@ -30,6 +30,7 @@ paths:
                             type: string
                             format: date-time
                             example: "2021-01-01T00:00:00+09:00"
+
     post:
       responses:
         201:
