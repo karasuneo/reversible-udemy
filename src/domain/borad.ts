@@ -16,7 +16,7 @@ export class Board {
     });
 
     // 石を置く
-    newDiscs[move.point.y][move.point.x] = move.disc
+    newDiscs[move.point.y][move.point.x] = move.disc;
 
     // ひっくり返す
 
@@ -24,8 +24,24 @@ export class Board {
   }
 
   get discs() {
-    return this._discs
+    return this._discs;
   }
-
 }
 
+const E = Disc.Empty;
+const D = Disc.Dark;
+const L = Disc.Light;
+
+const INITIAL_DISCS = [
+  [E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E],
+  [E, E, E, D, L, E, E, E],
+  [E, E, E, L, D, E, E, E],
+  [E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E],
+];
+
+// Boardクラスにのみ関心を持たせたいため、この形にした
+export const initialBoard = new Board(INITIAL_DISCS);
