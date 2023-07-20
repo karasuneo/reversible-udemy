@@ -18,10 +18,10 @@ export class Board {
     }
 
     // ひっくり返せる点をリストアップ
-    const flipPoint = this.listFlipPoints(move);
+    const flipPoints = this.listFlipPoints(move);
 
     // ひっくり返せる点がない場合、置くことができない
-    if (flipPoint.length === 0) {
+    if (flipPoints.length === 0) {
       throw new Error("Flip points is empty");
     }
 
@@ -37,6 +37,9 @@ export class Board {
     newDiscs[move.point.y][move.point.x] = move.disc;
 
     // ひっくり返す
+    flipPoints.forEach((p) => {
+      newDiscs[p.y][p.x] = move.disc;
+    });
 
     return new Board(newDiscs);
   }
@@ -51,18 +54,18 @@ export class Board {
       const flipCandidate: Point[] = [];
 
       // 一つ動いた位置から開始
-      let cusorX = walledX + xMove;
-      let cusorY = walledY + yMove;
+      let cursorX = walledX + xMove;
+      let cursorY = walledY + yMove;
 
       // 手と逆の石がある間、一つずつ見ていく
-      while (isOppositeDisc(move.disc, this._walledDiscs[cusorY][cusorX])) {
+      while (isOppositeDisc(move.disc, this._walledDiscs[cursorY][cursorX])) {
         // 番兵を考慮して-1する
-        flipCandidate.push(new Point(cusorX - 1, cusorY - 1));
-        cusorX += xMove;
-        cusorY += yMove;
+        flipCandidate.push(new Point(cursorX - 1, cursorY - 1));
+        cursorX += xMove;
+        cursorY += yMove;
 
-        // 次の手が同じ色の石なら、ひっくり返す意思が確定
-        if (move.disc === this._walledDiscs[cusorY][cusorX]) {
+        // 次が手と同じ色の石なら、ひっくり返す石が確定
+        if (move.disc === this._walledDiscs[cursorY][cursorX]) {
           flipPoints.push(...flipCandidate);
           break;
         }
@@ -95,15 +98,14 @@ export class Board {
     // 10個DiscWallが入った配列を作成
     const topAndBottomWall = Array(this._discs[0].length + 2).fill(Disc.Wall);
 
-    //
+    walled.push(topAndBottomWall);
+
     this._discs.forEach((line) => {
       const walledLine = [Disc.Wall, ...line, Disc.Wall];
       walled.push(walledLine);
     });
 
     // 一番上の10個DiscWallを追加
-    walled.push(topAndBottomWall);
-
     // 一番下を追加
     walled.push(topAndBottomWall);
 
