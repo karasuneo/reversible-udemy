@@ -6,7 +6,7 @@ import { MoveGateway } from "../../infrastructure/moveGateway";
 import { Move } from "./move";
 import { toDisc } from "./disc";
 import { Point } from "./point";
-import { Board } from "./borad";
+import { Board } from "./board";
 
 const turnGateway = new TurnGateway();
 const moveGateway = new MoveGateway();
