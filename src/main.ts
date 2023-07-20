@@ -7,6 +7,7 @@ import { MoveGateway } from "./infrastructure/moveGateway";
 import { SquareGateway } from "./infrastructure/squareGateway";
 import { gameRouter } from "./presentation/gameRouter";
 import { turnRouter } from "./presentation/turnRouter";
+import { DomainError } from "./domain/error/domainError";
 
 const PORT = 3000;
 
@@ -36,6 +37,11 @@ function errorHandler(
   res: express.Response,
   _next: express.NextFunction
 ) {
+  if (err instanceof DomainError) {
+    res.status(400).send({ type: err.type, message: err.message });
+    return;
+  }
+
   console.error(`Unexpected error occurred`, err);
   res.status(500).send({ message: "Unexpected error" });
 }
