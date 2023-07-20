@@ -1,17 +1,14 @@
 import { GameGateway } from "../dataaccess/gameGateway";
-import { TurnGateway } from "../dataaccess/turnGateway";
-import { SquareGateway } from "../dataaccess/squareGateway";
-import { MoveGateway } from "../dataaccess/moveGateway";
 import { connectMySQL } from "../dataaccess/connection";
-import { DARK, LIGHT } from "../application/constants";
-import { Turn } from "../domain/turn";
-import { Board } from "../domain/borad";
-import { toDisc } from "../domain/disc";
-import { Point } from "../domain/point";
-import { TurnRepository } from "../domain/turnRepository";
+import { toDisc } from "../domain/turn/disc";
+import { Point } from "../domain/turn/point";
+import { TurnRepository } from "../domain/turn/turnRepository";
+import { GameRepository } from "../domain/game/gameRepository";
 
 const gameGateway = new GameGateway();
+
 const turnRepository = new TurnRepository();
+const gameRepository = new GameRepository();
 
 class FindLatestGameTurnByTurnCountOutput {
   constructor(
@@ -44,14 +41,17 @@ export class TurnService {
   ): Promise<FindLatestGameTurnByTurnCountOutput> {
     const conn = await connectMySQL();
     try {
-      const gameRecord = await gameGateway.findLatest(conn);
-      if (!gameRecord) {
+      const game = await gameRepository.findLatest(conn);
+      if (!game) {
         throw new Error("Latest Game not found");
+      }
+      if (!game.id) {
+        throw new Error("Game id is undefined");
       }
 
       const turn = await turnRepository.findForGameIdAndTurnCount(
         conn,
-        gameRecord.id,
+        game.id,
         turnCount
       );
 
@@ -71,9 +71,12 @@ export class TurnService {
     try {
       // 1つ前のターンの情報を取得
       // 最新のゲームを取得
-      const gameRecord = await gameGateway.findLatest(conn);
-      if (!gameRecord) {
+      const game = await gameRepository.findLatest(conn);
+      if (!game) {
         throw new Error("Latest Game not found");
+      }
+      if (!game.id) {
+        throw new Error("Game id is undefined");
       }
 
       // ターンを取得
@@ -81,7 +84,7 @@ export class TurnService {
       // ターンに関するドメインモデルで扱う単位をリポジトリで一気に読み書き
       const previousTurn = await turnRepository.findForGameIdAndTurnCount(
         conn,
-        gameRecord.id,
+        game.id,
         previousTurnCount
       );
 

@@ -1,12 +1,12 @@
 import { GameGateway } from "../dataaccess/gameGateway";
-import { SquareGateway } from "../dataaccess/squareGateway";
 import { connectMySQL } from "../dataaccess/connection";
-import { TurnRepository } from "../domain/turnRepository";
-import { firstTurn } from "../domain/turn";
-
-const gameGateway = new GameGateway();
+import { TurnRepository } from "../domain/turn/turnRepository";
+import { firstTurn } from "../domain//turn/turn";
+import { GameRepository } from "../domain/game/gameRepository";
+import { Game } from "../domain/game/game";
 
 const turnRepository = new TurnRepository();
+const gameRepository = new GameRepository();
 
 export class GameService {
   async startNewGame() {
@@ -17,10 +17,13 @@ export class GameService {
       await conn.beginTransaction();
 
       // ゲームを保存
-      const gameRecord = await gameGateway.insert(conn, now);
+      const game = await gameRepository.save(conn, new Game(undefined, now));
+      if (!game.id) {
+        throw new Error("Game id is undefined");
+      }
 
       // ターンを生成
-      const turn = firstTurn(gameRecord.id, now);
+      const turn = firstTurn(game.id, now);
 
       // ターンを保存
       await turnRepository.save(conn, turn);
