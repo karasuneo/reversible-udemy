@@ -7,10 +7,7 @@ export const gameRouter = express.Router();
 const gameService = new GameService();
 
 gameRouter.post("/api/games", async (req, res) => {
-    await gameService.startNewGame();
-
-    
-  
+  await gameService.startNewGame();
 
   res.status(201).end();
 });

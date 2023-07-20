@@ -1,7 +1,6 @@
 import express from "express";
 import morgan from "morgan";
 import "express-async-errors";
-import mysql from "mysql2/promise";
 import { GameGateway } from "./infrastructure/gameGateway";
 import { TurnGateway } from "./infrastructure/turnGateway";
 import { MoveGateway } from "./infrastructure/moveGateway";
