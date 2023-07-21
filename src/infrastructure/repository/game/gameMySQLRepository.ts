@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import { GameGateway } from "../gameResult/gameGateway";
+import { GameGateway } from "./gameGateway";
 import { Game } from "../../../domain/model/game/game";
 import { GameRepository } from "../../../domain/model/game/gameRepository";
 

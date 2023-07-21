@@ -5,10 +5,6 @@ import { gameRouter } from "./presentation/gameRouter";
 import { turnRouter } from "./presentation/turnRouter";
 import { DomainError } from "./domain/error/domainError";
 import { ApplicationError } from "./application/error/applicationError";
-import { GameGateway } from "./infrastructure/repository/gameResult/gameGateway";
-import { TurnGateway } from "./infrastructure/repository/turn/turnGateway";
-import { MoveGateway } from "./infrastructure/repository/game/moveGateway";
-import { SquareGateway } from "./infrastructure/repository/turn/squareGateway";
 
 const PORT = 3000;
 
@@ -17,11 +13,6 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.static("static", { extensions: ["html"] }));
 app.use(express.json());
-
-const gameGateway = new GameGateway();
-const turnGateway = new TurnGateway();
-const moveGateway = new MoveGateway();
-const squareGateway = new SquareGateway();
 
 app.use(gameRouter);
 app.use(turnRouter);

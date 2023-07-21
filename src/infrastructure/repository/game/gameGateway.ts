@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import { GameRecord } from "../game/gameRecord";
+import { GameRecord } from "./gameRecord";
 
 export class GameGateway {
   async findLatest(conn: mysql.Connection): Promise<GameRecord | undefined> {

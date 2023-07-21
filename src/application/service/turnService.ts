@@ -1,7 +1,6 @@
 import { connectMySQL } from "../../infrastructure/connection";
 import { Disc } from "../../domain/model/turn/disc";
 import { Point } from "../../domain/model/turn/point";
-
 import { ApplicationError } from "../error/applicationError";
 import { GameResult } from "../../domain/model/gameResult/gameResult";
 import { TurnMySQLRepository } from "../../infrastructure/repository/turn/turnMySQLRepository";
