@@ -1,18 +1,16 @@
-import { GameGateway } from "../../infrastructure/gameGateway";
 import { connectMySQL } from "../../infrastructure/connection";
-import { Disc, toDisc } from "../../domain/model/turn/disc";
+import { Disc } from "../../domain/model/turn/disc";
 import { Point } from "../../domain/model/turn/point";
-import { TurnRepository } from "../../domain/model/turn/turnRepository";
-import { GameRepository } from "../../domain/model/game/gameRepository";
-import { GamaResultRepository } from "../../domain/model/gameResult/gameResultRepository";
+
 import { ApplicationError } from "../error/applicationError";
 import { GameResult } from "../../domain/model/gameResult/gameResult";
+import { TurnMySQLRepository } from "../../infrastructure/repository/turn/turnMySQLRepository";
+import { GameMySQLRepository } from "../../infrastructure/repository/game/gameMySQLRepository";
+import { GamaResultMySQLRepository } from "../../infrastructure/repository/gameResult/gameResultMySQLRepository";
 
-const gameGateway = new GameGateway();
-
-const turnRepository = new TurnRepository();
-const gameRepository = new GameRepository();
-const gamaResultRepository = new GamaResultRepository();
+const turnRepository = new TurnMySQLRepository()
+const gameRepository = new GameMySQLRepository()
+const gamaResultRepository = new GamaResultMySQLRepository()
 
 class FindLatestGameTurnByTurnCountOutput {
   constructor(
@@ -114,7 +112,7 @@ export class TurnService {
       if (newTurn.gameEnded()) {
         const winnerDisc = newTurn.winnerDisc();
         const gameResult = new GameResult(game.id, winnerDisc, newTurn.endAt);
-        await gamaResultRepository.save(conn, gameResult)
+        await gamaResultRepository.save(conn, gameResult);
         // 対戦結果を保存
       }
 

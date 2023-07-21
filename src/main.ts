@@ -1,14 +1,14 @@
 import express from "express";
 import morgan from "morgan";
 import "express-async-errors";
-import { GameGateway } from "./infrastructure/gameGateway";
-import { TurnGateway } from "./infrastructure/turnGateway";
-import { MoveGateway } from "./infrastructure/moveGateway";
-import { SquareGateway } from "./infrastructure/squareGateway";
 import { gameRouter } from "./presentation/gameRouter";
 import { turnRouter } from "./presentation/turnRouter";
 import { DomainError } from "./domain/error/domainError";
 import { ApplicationError } from "./application/error/applicationError";
+import { GameGateway } from "./infrastructure/repository/gameResult/gameGateway";
+import { TurnGateway } from "./infrastructure/repository/turn/turnGateway";
+import { MoveGateway } from "./infrastructure/repository/game/moveGateway";
+import { SquareGateway } from "./infrastructure/repository/turn/squareGateway";
 
 const PORT = 3000;
 
