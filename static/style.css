@@ -17,7 +17,7 @@ body {
 }
 
 .board {
-  width: 400px;
+  width: 480px;
   margin: 0 auto;
   margin-top: 20px;
   display: grid;
@@ -39,7 +39,7 @@ body {
 .stone {
   width: 52px;
   height: 52px;
-  border-radius: 50px;
+  border-radius: 50%;
 }
 
 .dark {

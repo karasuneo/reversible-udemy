@@ -8,7 +8,7 @@ export class Turn {
   constructor(
     private _gameId: number,
     private _turnCount: number,
-    private _nextDisc: Disc,
+    private _nextDisc: Disc | undefined,
     private _move: Move | undefined,
     private _board: Board,
     private _endAt: Date
@@ -28,7 +28,7 @@ export class Turn {
     const nextBoard = this._board.place(move);
 
     // TODO: 次の石が置けない場合はスキップする
-    const nextDisc = disc === Disc.Dark ? Disc.Light : Disc.Dark;
+    const nextDisc = this.decideNextDisc(nextBoard, disc);
 
     return new Turn(
       this._gameId,
@@ -38,6 +38,24 @@ export class Turn {
       nextBoard,
       new Date()
     );
+  }
+
+  private decideNextDisc(board: Board, previousDisc: Disc): Disc | undefined {
+    const exitDarkValidMove = board.exitValidMove(Disc.Dark);
+    const exitLightValidMove = board.exitValidMove(Disc.Light);
+
+    if (exitDarkValidMove && exitLightValidMove) {
+      // 両方おける場合は、前の石と反対の石の番
+      return previousDisc === Disc.Dark ? Disc.Light : Disc.Dark;
+    } else if (!exitLightValidMove && !exitDarkValidMove) {
+      // 両方おけない場合は、次の石はない
+      return undefined;
+    } else if (!exitDarkValidMove) {
+      // 片方しかおけない場合は、おける方の石の番
+      return Disc.Dark;
+    } else {
+      return Disc.Light;
+    }
   }
 
   get gameId() {

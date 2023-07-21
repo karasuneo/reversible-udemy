@@ -39,13 +39,13 @@ export class TurnGateway {
     conn: mysql.Connection,
     gameId: number,
     turnCount: number,
-    nextDisc: number,
+    nextDisc: number | undefined,
     endAt: Date
   ): Promise<TurnRecord> {
     // turnsテーブルにゲームIDとターン数、次の石の色、終了時間を送ってデータを追加
     const turnInsertResult = await conn.execute<any>(
       "insert into turns (game_id, turn_count, next_disc, end_at) values (?, ?, ?, ?)",
-      [gameId, turnCount, nextDisc, endAt]
+      [gameId, turnCount, nextDisc ?? null, endAt]
     );
     const turnId = turnInsertResult[0].insertId;
 
