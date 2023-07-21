@@ -4,12 +4,13 @@ import { Game } from "../../domain/model/game/game";
 import { GameRepository } from "../../domain/model/game/gameRepository";
 import { TurnRepository } from "../../domain/model/turn/turnRepository";
 
-export class GameService {
+export class StartNewGameUseCase {
   constructor(
     private _gameRepository: GameRepository,
     private _turnRepository: TurnRepository
   ) {}
-  async startNewGame() {
+
+  async run() {
     const now = new Date();
 
     const conn = await connectMySQL();
@@ -17,7 +18,10 @@ export class GameService {
       await conn.beginTransaction();
 
       // ゲームを保存
-      const game = await this._gameRepository.save(conn, new Game(undefined, now));
+      const game = await this._gameRepository.save(
+        conn,
+        new Game(undefined, now)
+      );
       if (!game.id) {
         throw new Error("Game id is undefined");
       }

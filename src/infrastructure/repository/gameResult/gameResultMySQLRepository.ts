@@ -6,7 +6,7 @@ import { GamaResultRepository } from "../../../domain/model/gameResult/gameResul
 
 const gameResultGateway = new GameResultGateway();
 
-export class GamaResultMySQLRepository implements GamaResultRepository {
+export class GameResultMySQLRepository implements GamaResultRepository {
   async findForGameId(
     conn: mysql.Connection,
     gameId: number
