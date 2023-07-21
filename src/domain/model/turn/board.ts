@@ -119,6 +119,15 @@ export class Board {
     return false;
   }
 
+  count(disc: Disc): number {
+    // Discに対して列を回して、列に対してフィルターをかけ、各店が指定された石になっているかチェックして、それらを合計している
+    return this._discs
+      .map((line) => {
+        return line.filter((discOnBoard) => discOnBoard === disc).length;
+      })
+      .reduce((v1, v2) => v1 + v2, 0);
+  }
+
   private wallDiscs(): Disc[][] {
     const walled: Disc[][] = [];
 
