@@ -3,10 +3,17 @@ import express from "express";
 import { TurnService } from "../application/service/turnService";
 import { Point } from "../domain/model/turn/point";
 import { toDisc } from "../domain/model/turn/disc";
+import { TurnMySQLRepository } from "../infrastructure/repository/turn/turnMySQLRepository";
+import { GameMySQLRepository } from "../infrastructure/repository/game/gameMySQLRepository";
+import { GamaResultMySQLRepository } from "../infrastructure/repository/gameResult/gameResultMySQLRepository";
 
 export const turnRouter = express.Router();
 
-const turnService = new TurnService();
+const turnService = new TurnService(
+  new TurnMySQLRepository(),
+  new GameMySQLRepository(),
+  new GamaResultMySQLRepository()
+);
 
 interface TurnGetResponseBody {
   turnCount: number;
