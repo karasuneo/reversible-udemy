@@ -41,16 +41,16 @@ export class Turn {
   }
 
   private decideNextDisc(board: Board, previousDisc: Disc): Disc | undefined {
-    const exitDarkValidMove = board.exitValidMove(Disc.Dark);
-    const exitLightValidMove = board.exitValidMove(Disc.Light);
+    const existDarkValidMove = board.existValidMove(Disc.Dark);
+    const existLightValidMove = board.existValidMove(Disc.Light);
 
-    if (exitDarkValidMove && exitLightValidMove) {
+    if (existDarkValidMove && existLightValidMove) {
       // 両方おける場合は、前の石と反対の石の番
       return previousDisc === Disc.Dark ? Disc.Light : Disc.Dark;
-    } else if (!exitLightValidMove && !exitDarkValidMove) {
+    } else if (!existLightValidMove && !existDarkValidMove) {
       // 両方おけない場合は、次の石はない
       return undefined;
-    } else if (!exitDarkValidMove) {
+    } else if (existDarkValidMove) {
       // 片方しかおけない場合は、おける方の石の番
       return Disc.Dark;
     } else {

@@ -94,7 +94,7 @@ export class Board {
     return flipPoints;
   }
 
-  exitValidMove(disc: Disc): boolean {
+  existValidMove(disc: Disc): boolean {
     for (let y = 0; y < this._discs.length; y++) {
       const line = this._discs[y];
 
@@ -115,6 +115,7 @@ export class Board {
         }
       }
     }
+
     return false;
   }
 
